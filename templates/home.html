@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Recommendation System</title>
+</head>
+<body>
+
+<h2>Student Academic Recommendation System</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    Register Number:
+    <input type="text" name="reg_no"><br><br>
+
+    Name:
+    <input type="text" name="name"><br><br>
+
+    Department:
+    <input type="text" name="department"><br><br>
+
+    Year:
+    <input type="number" name="year"><br><br>
+
+    Semester:
+    <input type="number" name="semester"><br><br>
+
+    <button type="submit">Submit</button>
+</form>
+
+<h3>Subjects</h3>
+<ul>
+{% for sub in subjects %}
+    <li>{{ sub }}</li>
+{% endfor %}
+</ul>
+
+<h3>Recommendations</h3>
+{% for subject, books in recommendations.items %}
+    <b>{{ subject }}</b>
+    <ul>
+        {% for book in books %}
+            <li>{{ book }}</li>
+        {% endfor %}
+    </ul>
+{% endfor %}
+
+</body>
+</html>
