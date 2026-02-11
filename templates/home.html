@@ -3,6 +3,7 @@
 <head>
     <title>Student Recommendation System</title>
 </head>
+
 <body>
 
 <h2>Student Academic Recommendation System</h2>
@@ -10,7 +11,9 @@
 <form method="POST">
     {% csrf_token %}
 
-    Register Number:
+    <h3>Student Details</h3>
+
+    Register No:
     <input type="text" name="reg_no"><br><br>
 
     Name:
@@ -25,25 +28,54 @@
     Semester:
     <input type="number" name="semester"><br><br>
 
-    <button type="submit">Submit</button>
+    <input type="submit" value="Load Subjects">
 </form>
 
-<h3>Subjects</h3>
-<ul>
-{% for sub in subjects %}
-    <li>{{ sub }}</li>
-{% endfor %}
-</ul>
+<hr>
+
+{% if subjects %}
+
+<h3>Enter Marks and Attendance</h3>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {% for sub in subjects %}
+        <h4>{{ sub }}</h4>
+
+        Marks:
+        <input type="number" name="{{ sub }}_marks"><br>
+
+        Classes Attended:
+        <input type="number" name="{{ sub }}_attended"><br>
+
+        Total Classes:
+        <input type="number" name="{{ sub }}_total"><br><br>
+
+    {% endfor %}
+
+    <input type="submit" value="Get Recommendation">
+</form>
+
+{% endif %}
+
+{% if recommendations %}
 
 <h3>Recommendations</h3>
-{% for subject, books in recommendations.items %}
-    <b>{{ subject }}</b>
+
+{% for subject, data in recommendations.items %}
+
+    <h4>{{ subject }}</h4>
+    Marks: {{ data.marks }} <br>
+    Attendance: {{ data.attendance }} % <br>
+
+    <b>Suggestions:</b>
     <ul>
-        {% for book in books %}
-            <li>{{ book }}</li>
+        {% for r in data.recommendations %}
+            <li>{{ r }}</li>
         {% endfor %}
     </ul>
+
 {% endfor %}
 
-</body>
-</html>
+{% endif %}
