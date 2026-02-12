@@ -29,6 +29,9 @@ jobs:
       run: |
         python manage.py makemigrations --check --dry-run
         python manage.py migrate
+    - name: Run Django Checks
+      run: |
+        python manage.py check    
     - name: Run Tests
       run: |
         python manage.py test
