@@ -124,11 +124,11 @@ def home(request):
         # LOOP FOR EACH SUBJECT
         for sub in subjects:
 
-            marks = int(request.POST.get(sub + "_marks", 0))
-            attended = int(request.POST.get(sub + "_attended", 0))
-            total = int(request.POST.get(sub + "_total", 1))
+            marks = int(request.POST.get(sub + "_marks") or 0)
+            attended = int(request.POST.get(sub + "_attended") or 0)
+            total = int(request.POST.get(sub + "_total") or 1)
 
-            attendance_percentage = (attended / total) * 100
+            attendance_percentage = (attended / total) * 100 if total > 0 else 0
 
             rec = []
 
