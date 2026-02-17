@@ -47,6 +47,7 @@
 
 <form method="POST">
     {% csrf_token %}
+    <input type="hidden" name="action" value="load_subjects">
 
     <h3>Student Details</h3>
 
@@ -80,6 +81,7 @@
     {% csrf_token %}
 
     <!-- Hidden fields to keep student data -->
+    <input type="hidden" name="action" value="get_recommendation">
     <input type="hidden" name="reg_no" value="{{ reg_no }}">
     <input type="hidden" name="name" value="{{ name }}">
     <input type="hidden" name="department" value="{{ department }}">
