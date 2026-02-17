@@ -1,8 +1,42 @@
 <!DOCTYPE html>
-
 <html>
+
 <head>
     <title>Student Academic Recommendation System</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 30px;
+        }
+
+        .excellent {
+            color: green;
+            font-weight: bold;
+        }
+
+        .good {
+            color: blue;
+            font-weight: bold;
+        }
+
+        .average {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .poor {
+            color: red;
+            font-weight: bold;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 
 <body>
@@ -14,27 +48,24 @@
 <form method="POST">
     {% csrf_token %}
 
-```
-<h3>Student Details</h3>
+    <h3>Student Details</h3>
 
-Register No:
-<input type="text" name="reg_no" required><br><br>
+    Register No:
+    <input type="text" name="reg_no" required><br><br>
 
-Name:
-<input type="text" name="name" required><br><br>
+    Name:
+    <input type="text" name="name" required><br><br>
 
-Department:
-<input type="text" name="department" required><br><br>
+    Department:
+    <input type="text" name="department" required><br><br>
 
-Year:
-<input type="number" name="year" required><br><br>
+    Year:
+    <input type="number" name="year" required><br><br>
 
-Semester:
-<input type="number" name="semester" required><br><br>
+    Semester:
+    <input type="number" name="semester" required><br><br>
 
-<input type="submit" value="Load Subjects">
-```
-
+    <input type="submit" value="Load Subjects">
 </form>
 
 <hr>
@@ -48,31 +79,29 @@ Semester:
 <form method="POST">
     {% csrf_token %}
 
-```
-<!-- Hidden fields to keep student data -->
-<input type="hidden" name="reg_no" value="{{ reg_no }}">
-<input type="hidden" name="name" value="{{ name }}">
-<input type="hidden" name="department" value="{{ department }}">
-<input type="hidden" name="year" value="{{ year }}">
-<input type="hidden" name="semester" value="{{ semester }}">
+    <!-- Hidden fields to keep student data -->
+    <input type="hidden" name="reg_no" value="{{ reg_no }}">
+    <input type="hidden" name="name" value="{{ name }}">
+    <input type="hidden" name="department" value="{{ department }}">
+    <input type="hidden" name="year" value="{{ year }}">
+    <input type="hidden" name="semester" value="{{ semester }}">
 
-{% for sub in subjects %}
-    <h4>{{ sub }}</h4>
+    {% for sub in subjects %}
+        <div class="card">
+            <h4>{{ sub }}</h4>
 
-    Marks:
-    <input type="number" name="{{ sub }}_marks" required><br>
+            Marks:
+            <input type="number" name="{{ sub }}_marks" required><br><br>
 
-    Classes Attended:
-    <input type="number" name="{{ sub }}_attended" required><br>
+            Classes Attended:
+            <input type="number" name="{{ sub }}_attended" required><br><br>
 
-    Total Classes:
-    <input type="number" name="{{ sub }}_total" required><br><br>
+            Total Classes:
+            <input type="number" name="{{ sub }}_total" required><br>
+        </div>
+    {% endfor %}
 
-{% endfor %}
-
-<input type="submit" value="Get Recommendation">
-```
-
+    <input type="submit" value="Get Recommendation">
 </form>
 
 {% endif %}
@@ -83,14 +112,75 @@ Semester:
 
 {% if recommendations %}
 
-<h3>Recommendations</h3>
+<h3>Overall Performance Summary</h3>
+
+Average Marks: {{ overall_marks }} <br>
+Average Attendance: {{ overall_attendance }} % <br>
+
+Overall Performance:
+<span class="
+{% if overall_performance == 'Excellent' %}
+excellent
+{% elif overall_performance == 'Good' %}
+good
+{% elif overall_performance == 'Average' %}
+average
+{% else %}
+poor
+{% endif %}
+">
+{{ overall_performance }}
+</span>
+
+<br><br>
+
+<strong>Strong Subjects:</strong>
+<ul>
+    {% for s in strong_subjects %}
+        <li>{{ s }}</li>
+    {% empty %}
+        <li>None</li>
+    {% endfor %}
+</ul>
+
+<strong>Weak Subjects:</strong>
+<ul>
+    {% for w in weak_subjects %}
+        <li>{{ w }}</li>
+    {% empty %}
+        <li>None</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h3>Subject-wise Recommendations</h3>
 
 {% for subject, data in recommendations.items %}
 
-```
+<div class="card">
+
 <h4>{{ subject }}</h4>
+
 Marks: {{ data.marks }} <br>
 Attendance: {{ data.attendance }} % <br>
+
+Performance:
+<span class="
+{% if data.performance == 'Excellent' %}
+excellent
+{% elif data.performance == 'Good' %}
+good
+{% elif data.performance == 'Average' %}
+average
+{% else %}
+poor
+{% endif %}
+">
+{{ data.performance }}
+</span>
+
+<br><br>
 
 <b>Suggestions:</b>
 <ul>
@@ -98,7 +188,8 @@ Attendance: {{ data.attendance }} % <br>
         <li>{{ r }}</li>
     {% endfor %}
 </ul>
-```
+
+</div>
 
 {% endfor %}
 
