@@ -80,35 +80,31 @@
 <form method="POST">
     {% csrf_token %}
 
-    <!-- Hidden fields to keep student data -->
     <input type="hidden" name="action" value="get_recommendation">
-    <input type="hidden" name="reg_no" value="{{ reg_no }}">
-    <input type="hidden" name="name" value="{{ name }}">
-    <input type="hidden" name="department" value="{{ department }}">
-    <input type="hidden" name="year" value="{{ year }}">
-    <input type="hidden" name="semester" value="{{ semester }}">
 
-    {% for sub in subjects %}
-        <div class="card">
-            <h4>{{ sub }}</h4>
+    {% for subject in subjects %}
 
-            Marks:
-            <input type="number" name="{{ sub }}_marks" required><br><br>
+        <h4>{{ subject }}</h4>
 
-            Classes Attended:
-            <input type="number" name="{{ sub }}_attended" required><br><br>
+        <!-- ADD THIS LINE -->
+        <input type="hidden" name="subjects" value="{{ subject }}">
 
-            Total Classes:
-            <input type="number" name="{{ sub }}_total" required><br>
-        </div>
+        Marks:
+        <input type="number" name="{{ subject }}_marks" required>
+
+        Classes Attended:
+        <input type="number" name="{{ subject }}_attended" required>
+
+        Total Classes:
+        <input type="number" name="{{ subject }}_total" required>
+
+        <br><br>
+
     {% endfor %}
 
-    <input type="submit" value="Get Recommendation">
+    <button type="submit">Get Recommendation</button>
 </form>
 
-{% endif %}
-
-<hr>
 
 <!-- ================== RESULT SECTION ================== -->
 
