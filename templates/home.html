@@ -1,37 +1,45 @@
 <!DOCTYPE html>
+
 <html>
 <head>
-    <title>Student Recommendation System</title>
+    <title>Student Academic Recommendation System</title>
 </head>
 
 <body>
 
 <h2>Student Academic Recommendation System</h2>
 
+<!-- ================== FORM 1 : STUDENT DETAILS ================== -->
+
 <form method="POST">
     {% csrf_token %}
 
-    <h3>Student Details</h3>
+```
+<h3>Student Details</h3>
 
-    Register No:
-    <input type="text" name="reg_no"><br><br>
+Register No:
+<input type="text" name="reg_no" required><br><br>
 
-    Name:
-    <input type="text" name="name"><br><br>
+Name:
+<input type="text" name="name" required><br><br>
 
-    Department:
-    <input type="text" name="department"><br><br>
+Department:
+<input type="text" name="department" required><br><br>
 
-    Year:
-    <input type="number" name="year"><br><br>
+Year:
+<input type="number" name="year" required><br><br>
 
-    Semester:
-    <input type="number" name="semester"><br><br>
+Semester:
+<input type="number" name="semester" required><br><br>
 
-    <input type="submit" value="Load Subjects">
+<input type="submit" value="Load Subjects">
+```
+
 </form>
 
 <hr>
+
+<!-- ================== FORM 2 : MARKS & ATTENDANCE ================== -->
 
 {% if subjects %}
 
@@ -40,24 +48,38 @@
 <form method="POST">
     {% csrf_token %}
 
-    {% for sub in subjects %}
-        <h4>{{ sub }}</h4>
+```
+<!-- Hidden fields to keep student data -->
+<input type="hidden" name="reg_no" value="{{ reg_no }}">
+<input type="hidden" name="name" value="{{ name }}">
+<input type="hidden" name="department" value="{{ department }}">
+<input type="hidden" name="year" value="{{ year }}">
+<input type="hidden" name="semester" value="{{ semester }}">
 
-        Marks:
-        <input type="number" name="{{ sub }}_marks"><br>
+{% for sub in subjects %}
+    <h4>{{ sub }}</h4>
 
-        Classes Attended:
-        <input type="number" name="{{ sub }}_attended"><br>
+    Marks:
+    <input type="number" name="{{ sub }}_marks" required><br>
 
-        Total Classes:
-        <input type="number" name="{{ sub }}_total"><br><br>
+    Classes Attended:
+    <input type="number" name="{{ sub }}_attended" required><br>
 
-    {% endfor %}
+    Total Classes:
+    <input type="number" name="{{ sub }}_total" required><br><br>
 
-    <input type="submit" value="Get Recommendation">
+{% endfor %}
+
+<input type="submit" value="Get Recommendation">
+```
+
 </form>
 
 {% endif %}
+
+<hr>
+
+<!-- ================== RESULT SECTION ================== -->
 
 {% if recommendations %}
 
@@ -65,17 +87,22 @@
 
 {% for subject, data in recommendations.items %}
 
-    <h4>{{ subject }}</h4>
-    Marks: {{ data.marks }} <br>
-    Attendance: {{ data.attendance }} % <br>
+```
+<h4>{{ subject }}</h4>
+Marks: {{ data.marks }} <br>
+Attendance: {{ data.attendance }} % <br>
 
-    <b>Suggestions:</b>
-    <ul>
-        {% for r in data.recommendations %}
-            <li>{{ r }}</li>
-        {% endfor %}
-    </ul>
+<b>Suggestions:</b>
+<ul>
+    {% for r in data.recommendations %}
+        <li>{{ r }}</li>
+    {% endfor %}
+</ul>
+```
 
 {% endfor %}
 
 {% endif %}
+
+</body>
+</html>

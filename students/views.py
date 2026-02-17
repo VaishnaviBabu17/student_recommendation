@@ -104,7 +104,7 @@ def home(request):
 
     if request.method == "POST":
 
-        reg_no = request.POST['reg_no']
+        reg_no = request.POST.get('reg_no')
         name = request.POST['name']
         department = request.POST['department']
         year = int(request.POST['year'])
