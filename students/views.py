@@ -70,6 +70,66 @@ RESOURCES = {
         ]
     },
 
+    "Transmission Lines and Antennas": {
+    "books": [
+        "Antenna Theory by Balanis",
+        "Transmission Lines and Waveguides by Jordan & Balmain"
+    ],
+    "courses": [
+        "NPTEL Antenna Course",
+        "MIT OCW Electromagnetics"
+    ],
+    "practice": [
+        "GATE EC Antenna Questions",
+        "Numerical Problems Practice"
+    ]
+},
+
+"IoT and Applications": {
+    "books": [
+        "Internet of Things by Raj Kamal",
+        "IoT: A Hands-On Approach by Bahga & Madisetti"
+    ],
+    "courses": [
+        "NPTEL IoT Course",
+        "Coursera IoT Specialization"
+    ],
+    "practice": [
+        "Arduino IoT Projects",
+        "Mini IoT Based Projects"
+    ]
+},
+
+"Artificial Intelligence": {
+    "books": [
+        "Artificial Intelligence by Stuart Russell",
+        "AI by Elaine Rich"
+    ],
+    "courses": [
+        "Andrew Ng Machine Learning",
+        "MIT AI Course"
+    ],
+    "practice": [
+        "LeetCode AI Problems",
+        "Kaggle Practice Projects"
+    ]
+},
+
+"Database Management Systems": {
+    "books": [
+        "DBMS by Korth",
+        "Database System Concepts by Silberschatz"
+    ],
+    "courses": [
+        "NPTEL DBMS",
+        "Stanford Database Course"
+    ],
+    "practice": [
+        "SQL Practice on HackerRank",
+        "DBMS Interview Questions"
+    ]
+},
+
     "Operating Systems": {
         "books": [
             "Operating System Concepts by Galvin",
