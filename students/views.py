@@ -104,7 +104,7 @@ def home(request):
 
         action = request.POST.get("action")
 
-        # -------- STEP 1 : LOAD SUBJECTS --------
+        # ---------- LOAD SUBJECTS ----------
         if action == "load_subjects":
 
             reg_no = request.POST.get("reg_no")
@@ -124,15 +124,10 @@ def home(request):
             )
 
             return render(request, "home.html", {
-                "subjects": subjects,
-                "reg_no": reg_no,
-                "name": name,
-                "department": department,
-                "year": year,
-                "semester": semester
+                "subjects": subjects
             })
 
-        # -------- STEP 2 : GET RECOMMENDATION --------
+        # ---------- GET RECOMMENDATION ----------
         elif action == "get_recommendation":
 
             subjects = request.POST.getlist("subjects")
@@ -141,6 +136,10 @@ def home(request):
             total_attendance_sum = 0
             weak_subjects = []
             strong_subjects = []
+
+            subject_names = []
+            marks_data = []
+            attendance_data = []
 
             for sub in subjects:
 
@@ -155,13 +154,11 @@ def home(request):
                 total_marks_sum += marks
                 total_attendance_sum += attendance_percentage
 
-                if marks < 50:
-                    weak_subjects.append(sub)
+                subject_names.append(sub)
+                marks_data.append(marks)
+                attendance_data.append(round(attendance_percentage, 2))
 
-                if marks >= 80:
-                    strong_subjects.append(sub)
-
-                # PERFORMANCE LEVEL
+                # PERFORMANCE
                 if marks >= 85:
                     performance = "Excellent"
                 elif marks >= 70:
@@ -171,32 +168,48 @@ def home(request):
                 else:
                     performance = "Poor"
 
-                rec = []
+                if performance == "Poor":
+                    weak_subjects.append(sub)
 
-                if marks < 50:
-                    rec.append("Focus on fundamentals and revision.")
-
-                if attendance_percentage < 75:
-                    rec.append("Improve attendance to minimum 75%.")
+                if performance == "Excellent":
+                    strong_subjects.append(sub)
 
                 resource_data = RESOURCES.get(sub, {})
 
+                books = resource_data.get("books", [])
+                courses = resource_data.get("courses", [])
+                practice = resource_data.get("practice", [])
+
+                improvement_plan = []
+
                 if performance == "Poor":
-                    rec.extend(resource_data.get("books", []))
-                    rec.extend(resource_data.get("practice", []))
+                    improvement_plan.append("Revise fundamentals daily.")
+                    improvement_plan.append("Solve basic problems regularly.")
 
                 elif performance == "Average":
-                    rec.extend(resource_data.get("practice", []))
+                    improvement_plan.append("Focus on weak topics.")
+                    improvement_plan.append("Increase practice sessions.")
+
+                elif performance == "Good":
+                    improvement_plan.append("Practice advanced problems.")
+                    improvement_plan.append("Work on mini projects.")
 
                 else:
-                    rec.extend(resource_data.get("courses", []))
+                    improvement_plan.append("Explore advanced applications.")
+                    improvement_plan.append("Start research or projects.")
+
+                if attendance_percentage < 75:
+                    improvement_plan.append("Improve attendance above 75%.")
 
                 recommendations.append({
                     "subject": sub,
                     "marks": marks,
                     "attendance": round(attendance_percentage, 2),
                     "performance": performance,
-                    "recommendations": rec
+                    "books": books,
+                    "courses": courses,
+                    "practice": practice,
+                    "improvement_plan": improvement_plan
                 })
 
             total_subjects = len(subjects)
@@ -219,7 +232,10 @@ def home(request):
                 "overall_attendance": round(overall_attendance, 2),
                 "overall_performance": overall_performance,
                 "weak_subjects": weak_subjects,
-                "strong_subjects": strong_subjects
+                "strong_subjects": strong_subjects,
+                "subject_names": subject_names,
+                "marks_data": marks_data,
+                "attendance_data": attendance_data
             })
 
     return render(request, "home.html")

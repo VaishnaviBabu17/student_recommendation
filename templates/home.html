@@ -4,47 +4,94 @@
 <head>
     <title>Student Academic Recommendation System</title>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         body {
             font-family: Arial;
-            margin: 30px;
+            margin: 0;
+            background-color: #f4f6f9;
         }
 
-        .excellent {
-            color: green;
-            font-weight: bold;
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            text-align: center;
         }
 
-        .good {
-            color: blue;
-            font-weight: bold;
-        }
-
-        .average {
-            color: orange;
-            font-weight: bold;
-        }
-
-        .poor {
-            color: red;
-            font-weight: bold;
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
         }
 
         .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .excellent { background-color: #28a745; }
+        .good { background-color: #007bff; }
+        .average { background-color: #ffc107; }
+        .poor { background-color: #dc3545; }
+
+        input {
+            padding: 7px;
+            margin: 5px;
+            border-radius: 5px;
             border: 1px solid #ccc;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 8px;
+        }
+
+        button {
+            padding: 8px 18px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1a252f;
+        }
+
+        h3 {
+            color: #2c3e50;
+        }
+
+        .section-title {
+            margin-top: 15px;
+            color: #34495e;
+        }
+
+        canvas {
+            margin-top: 15px;
         }
     </style>
 </head>
 
 <body>
 
-<h2>Student Academic Recommendation System</h2>
+<div class="header">
+    <h2>📊 Student Academic Recommendation Dashboard</h2>
+</div>
 
-<!-- ================== FORM 1 : STUDENT DETAILS ================== -->
+<div class="container">
 
+<!-- ================= STUDENT DETAILS ================= -->
+
+<div class="card">
 <form method="POST">
     {% csrf_token %}
     <input type="hidden" name="action" value="load_subjects">
@@ -52,50 +99,49 @@
     <h3>Student Details</h3>
 
     Register No:
-    <input type="text" name="reg_no" required><br><br>
+    <input type="text" name="reg_no" required>
 
     Name:
-    <input type="text" name="name" required><br><br>
+    <input type="text" name="name" required>
 
     Department:
-    <input type="text" name="department" required><br><br>
+    <input type="text" name="department" required>
 
     Year:
-    <input type="number" name="year" required><br><br>
+    <input type="number" name="year" required>
 
     Semester:
-    <input type="number" name="semester" required><br><br>
+    <input type="number" name="semester" required>
 
-    <input type="submit" value="Load Subjects">
+    <br><br>
+    <button type="submit">Load Subjects</button>
 </form>
+</div>
 
-<hr>
-
-<!-- ================== FORM 2 : MARKS & ATTENDANCE ================== -->
+<!-- ================= MARK ENTRY ================= -->
 
 {% if subjects %}
 
+<div class="card">
 <h3>Enter Marks and Attendance</h3>
 
 <form method="POST">
     {% csrf_token %}
-
     <input type="hidden" name="action" value="get_recommendation">
 
     {% for subject in subjects %}
 
         <h4>{{ subject }}</h4>
 
-        <!-- ADD THIS LINE -->
         <input type="hidden" name="subjects" value="{{ subject }}">
 
         Marks:
         <input type="number" name="{{ subject }}_marks" required>
 
-        Classes Attended:
+        Attended:
         <input type="number" name="{{ subject }}_attended" required>
 
-        Total Classes:
+        Total:
         <input type="number" name="{{ subject }}_total" required>
 
         <br><br>
@@ -104,28 +150,26 @@
 
     <button type="submit">Get Recommendation</button>
 </form>
+</div>
 
 {% endif %}
 
-<!-- ================== RESULT SECTION ================== -->
+<!-- ================= RESULTS ================= -->
 
 {% if recommendations %}
 
-<h3>Overall Performance Summary</h3>
+<div class="card">
+<h3>Overall Performance</h3>
 
-Average Marks: {{ overall_marks }} <br>
-Average Attendance: {{ overall_attendance }} % <br>
+Average Marks: <b>{{ overall_marks }}</b><br>
+Average Attendance: <b>{{ overall_attendance }}%</b><br><br>
 
-Overall Performance:
-<span class="
-{% if overall_performance == 'Excellent' %}
-excellent
-{% elif overall_performance == 'Good' %}
-good
-{% elif overall_performance == 'Average' %}
-average
-{% else %}
-poor
+Performance:
+<span class="badge
+{% if overall_performance == 'Excellent' %} excellent
+{% elif overall_performance == 'Good' %} good
+{% elif overall_performance == 'Average' %} average
+{% else %} poor
 {% endif %}
 ">
 {{ overall_performance }}
@@ -133,66 +177,128 @@ poor
 
 <br><br>
 
-<strong>Strong Subjects:</strong>
+<b>Strong Subjects:</b>
 <ul>
-    {% for s in strong_subjects %}
-        <li>{{ s }}</li>
-    {% empty %}
-        <li>None</li>
-    {% endfor %}
+{% for s in strong_subjects %}
+<li>{{ s }}</li>
+{% empty %}
+<li>None</li>
+{% endfor %}
 </ul>
 
-<strong>Weak Subjects:</strong>
+<b>Weak Subjects:</b>
 <ul>
-    {% for w in weak_subjects %}
-        <li>{{ w }}</li>
-    {% empty %}
-        <li>None</li>
-    {% endfor %}
+{% for w in weak_subjects %}
+<li>{{ w }}</li>
+{% empty %}
+<li>None</li>
+{% endfor %}
 </ul>
 
-<hr>
+</div>
+
+<!-- ================= PERFORMANCE ANALYTICS ================= -->
+
+<div class="card">
+<h3>📈 Performance Analytics</h3>
+
+<canvas id="marksChart"></canvas>
+<br>
+<canvas id="attendanceChart"></canvas>
+
+</div>
+
+<!-- ================= SUBJECT CARDS ================= -->
 
 <h3>Subject-wise Recommendations</h3>
 
-{% for subject, data in recommendations.items %}
+{% for data in recommendations %}
 
 <div class="card">
 
-<h4>{{ subject }}</h4>
+<h3>{{ data.subject }}</h3>
 
 Marks: {{ data.marks }} <br>
-Attendance: {{ data.attendance }} % <br>
+Attendance: {{ data.attendance }} % <br><br>
 
 Performance:
-<span class="
-{% if data.performance == 'Excellent' %}
-excellent
-{% elif data.performance == 'Good' %}
-good
-{% elif data.performance == 'Average' %}
-average
-{% else %}
-poor
+<span class="badge
+{% if data.performance == 'Excellent' %} excellent
+{% elif data.performance == 'Good' %} good
+{% elif data.performance == 'Average' %} average
+{% else %} poor
 {% endif %}
 ">
 {{ data.performance }}
 </span>
 
-<br><br>
-
-<b>Suggestions:</b>
+<h4 class="section-title">📈 Improvement Plan</h4>
 <ul>
-    {% for r in data.recommendations %}
-        <li>{{ r }}</li>
-    {% endfor %}
+{% for i in data.improvement_plan %}
+<li>{{ i }}</li>
+{% endfor %}
+</ul>
+
+<h4 class="section-title">📚 Books</h4>
+<ul>
+{% for b in data.books %}
+<li>{{ b }}</li>
+{% endfor %}
+</ul>
+
+<h4 class="section-title">🎓 Courses</h4>
+<ul>
+{% for c in data.courses %}
+<li>{{ c }}</li>
+{% endfor %}
+</ul>
+
+<h4 class="section-title">📝 Practice</h4>
+<ul>
+{% for p in data.practice %}
+<li>{{ p }}</li>
+{% endfor %}
 </ul>
 
 </div>
 
 {% endfor %}
 
+<!-- ================= CHART SCRIPT ================= -->
+
+<script>
+const subjects = {{ subject_names|safe }};
+const marks = {{ marks_data|safe }};
+const attendance = {{ attendance_data|safe }};
+
+new Chart(document.getElementById('marksChart'), {
+    type: 'bar',
+    data: {
+        labels: subjects,
+        datasets: [{
+            label: 'Marks',
+            data: marks,
+            backgroundColor: '#007bff'
+        }]
+    }
+});
+
+new Chart(document.getElementById('attendanceChart'), {
+    type: 'line',
+    data: {
+        labels: subjects,
+        datasets: [{
+            label: 'Attendance %',
+            data: attendance,
+            borderColor: '#28a745',
+            fill: false
+        }]
+    }
+});
+</script>
+
 {% endif %}
 
+</div>
 </body>
 </html>
