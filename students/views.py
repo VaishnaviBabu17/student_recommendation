@@ -1198,7 +1198,7 @@ def student_dashboard(request):
 def student_info(request):
 
     if request.method == "POST":
-        request.session["reg_no"] = request.POST.get("reg_no")
+        request.session["roll_no"] = request.POST.get("roll_no")
         request.session["name"] = request.POST.get("name")
         request.session["department"] = request.POST.get("department")
         request.session["year"] = request.POST.get("year")
