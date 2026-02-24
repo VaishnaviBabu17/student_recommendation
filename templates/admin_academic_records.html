@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Records</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { color: #0f766e; font-size: 28px; }
+        .header-actions { display: flex; gap: 15px; }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(15, 118, 110, 0.4);
+        }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-secondary:hover { background: #4b5563; }
+        .btn-small { padding: 8px 16px; font-size: 14px; }
+        .filters-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .filters-title { font-size: 18px; font-weight: 700; color: #2c3e50; margin-bottom: 20px; }
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size: 14px; font-weight: 600; color: #4b5563; margin-bottom: 5px; }
+        .form-group input, .form-group select {
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #0f766e; }
+        .filter-actions { display: flex; gap: 10px; }
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .table-header { padding: 20px 25px; background: #f8f9fa; border-bottom: 2px solid #e5e7eb; }
+        .table-header h2 { color: #2c3e50; font-size: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #f8f9fa; }
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #4b5563;
+            font-size: 14px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        td { padding: 15px; border-bottom: 1px solid #e5e7eb; color: #2c3e50; }
+        tbody tr:hover { background: #f8f9fa; }
+        .no-data { text-align: center; padding: 60px 20px; color: #7f8c8d; }
+        .alert { padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; }
+        .alert-success { background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-weak { background: #fee2e2; color: #dc2626; }
+        .badge-average { background: #fef3c7; color: #d97706; }
+        .badge-strong { background: #d1fae5; color: #059669; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Academic Records</h1>
+            <div class="header-actions">
+                <a href="{% url 'admin_add_academic_record' %}" class="btn btn-primary">➕ Add Record</a>
+                <a href="{% url 'admin_bulk_upload' %}" class="btn btn-primary">📤 Bulk Upload</a>
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Back</a>
+            </div>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="filters-card">
+            <div class="filters-title">🔍 Filter Academic Records</div>
+            <form method="GET">
+                <div class="filters-grid">
+                    <div class="form-group">
+                        <label>Search Student</label>
+                        <input type="text" name="search" placeholder="Name, Username, Roll No" value="{{ search }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select name="department">
+                            <option value="">All Departments</option>
+                            {% for dept in departments %}
+                            <option value="{{ dept }}" {% if dept == selected_department %}selected{% endif %}>{{ dept }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Semester</label>
+                        <select name="semester">
+                            <option value="">All Semesters</option>
+                            {% for i in "12345678" %}
+                            <option value="{{ i }}" {% if selected_semester == i %}selected{% endif %}>Semester {{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" name="subject" placeholder="Subject name" value="{{ selected_subject }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Performance</label>
+                        <select name="performance">
+                            <option value="">All Performance</option>
+                            <option value="weak" {% if selected_performance == "weak" %}selected{% endif %}>Weak (<25)</option>
+                            <option value="average" {% if selected_performance == "average" %}selected{% endif %}>Average (25-40)</option>
+                            <option value="strong" {% if selected_performance == "strong" %}selected{% endif %}>Strong (>40)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary btn-small">Apply Filters</button>
+                    <a href="{% url 'admin_academic_records' %}" class="btn btn-secondary btn-small">Clear Filters</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-card">
+            <div class="table-header">
+                <h2>📋 Academic Records ({{ records|length }} records)</h2>
+            </div>
+            {% if records %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Roll No</th>
+                        <th>Department</th>
+                        <th>Semester</th>
+                        <th>Subject</th>
+                        <th>Internal</th>
+                        <th>Marks (/50)</th>
+                        <th>Attendance</th>
+                        <th>Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td>{{ record.student.name|default:record.student.user.username }}</td>
+                        <td>{{ record.student.roll_no|default:"—" }}</td>
+                        <td>{{ record.student.department|default:"—" }}</td>
+                        <td>{{ record.student.semester|default:"—" }}</td>
+                        <td>{{ record.subject }}</td>
+                        <td>{{ record.internal_type }}</td>
+                        <td><strong>{{ record.marks }}</strong></td>
+                        <td>{{ record.attendance_percentage }}%</td>
+                        <td>
+                            {% if record.marks < 25 %}
+                            <span class="badge badge-weak">Weak</span>
+                            {% elif record.marks <= 40 %}
+                            <span class="badge badge-average">Average</span>
+                            {% else %}
+                            <span class="badge badge-strong">Strong</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-data">
+                <h2>No academic records found</h2>
+                <p>Try adjusting your filters or add new records</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

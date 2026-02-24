@@ -1,0 +1,264 @@
+{% extends 'base_student.html' %}
+
+{% block content %}
+<style>
+    .info-container {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .info-header {
+        background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+    }
+
+    .info-header h1 {
+        font-size: 28px;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .info-header p {
+        font-size: 15px;
+        opacity: 0.95;
+    }
+
+    .info-body {
+        padding: 40px 30px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .form-group label .required {
+        color: #e74c3c;
+        margin-left: 3px;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s;
+        background: #f8f9fa;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #0f766e;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+    }
+
+    .form-group select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230f766e' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        padding-right: 40px;
+    }
+
+    .input-icon {
+        position: relative;
+    }
+
+    .input-icon::before {
+        content: attr(data-icon);
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: #0f766e;
+    }
+
+    .input-icon input {
+        padding-left: 45px;
+    }
+
+    .info-note {
+        background: #d1fae5;
+        border-left: 4px solid #0f766e;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        font-size: 14px;
+        color: #2c3e50;
+    }
+
+    .info-note strong {
+        color: #0f766e;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(15, 118, 110, 0.4);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="info-container">
+    <div class="info-card">
+        <div class="info-header">
+            <h1>📋 Student Information</h1>
+            <p>Please provide your academic details to continue</p>
+        </div>
+
+        <div class="info-body">
+            <div class="info-note">
+                <strong>📌 Note:</strong> All fields are mandatory. Make sure to enter accurate information for personalized recommendations.
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="reg_no">Registration Number <span class="required">*</span></label>
+                    <div class="input-icon" data-icon="🎓">
+                        <input type="text" 
+                               id="reg_no"
+                               name="reg_no" 
+                               placeholder="Enter your registration number" 
+                               required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Full Name <span class="required">*</span></label>
+                    <div class="input-icon" data-icon="👤">
+                        <input type="text" 
+                               id="name"
+                               name="name" 
+                               placeholder="Enter your full name" 
+                               required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="department">Department <span class="required">*</span></label>
+                    <select id="department" name="department" required>
+                        <option value="" disabled selected>Select your department</option>
+                        <option value="BME">Biomedical Engineering</option>
+                        <option value="CIVIL">Civil Engineering</option>
+                        <option value="CSD">Computer Science & Design</option>
+                        <option value="CSE">Computer Science & Engineering</option>
+                        <option value="EEE">Electrical & Electronics Engineering</option>
+                        <option value="ECE">Electronics & Communication Engineering</option>
+                        <option value="EIE">Electronics & Instrumentation Engineering</option>
+                        <option value="ISE">Information Science & Engineering</option>
+                        <option value="MECH">Mechanical Engineering</option>
+                        <option value="MECT">Mechatronics Engineering</option>
+                        <option value="AGE">Agricultural Engineering</option>
+                        <option value="AIDS">Artificial Intelligence and Data Science</option>
+                        <option value="AIML">Artificial Intelligence and Machine Learning</option>
+                        <option value="BT">Biotechnology</option>
+                        <option value="CSBS">Computer Science & Business Systems</option>
+                        <option value="CT">Computer Technology</option>
+                        <option value="FT">Food Technology</option>
+                        <option value="FASH">Fashion Technology</option>
+                        <option value="IT">Information Technology</option>
+                        <option value="TT">Textile Technology</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="year">Academic Year <span class="required">*</span></label>
+                        <select id="year" name="year" required>
+                            <option value="" disabled selected>Select year</option>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="semester">Semester <span class="required">*</span></label>
+                        <select id="semester" name="semester" required>
+                            <option value="" disabled selected>Select semester</option>
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                            <option value="3">Semester 3</option>
+                            <option value="4">Semester 4</option>
+                            <option value="5">Semester 5</option>
+                            <option value="6">Semester 6</option>
+                            <option value="7">Semester 7</option>
+                            <option value="8">Semester 8</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="internal_type">Internal Exam <span class="required">*</span></label>
+                    <select id="internal_type" name="internal_type" required>
+                        <option value="" disabled selected>Select internal exam</option>
+                        <option value="Internal 1">Internal 1</option>
+                        <option value="Internal 2">Internal 2</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-submit">Continue to Enter Marks →</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

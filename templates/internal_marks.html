@@ -1,0 +1,19 @@
+<h2>Internal Marks Entry</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <input type="hidden" name="semester_id" value="1">
+
+    {% for subject in subjects %}
+        <h4>{{ subject.name }}</h4>
+
+        Test 1: <input type="number" name="test1_{{ subject.id }}"><br>
+        Test 2: <input type="number" name="test2_{{ subject.id }}"><br>
+        Assignment: <input type="number" name="assignment_{{ subject.id }}"><br>
+        Attendance: <input type="number" step="0.1" name="attendance_{{ subject.id }}"><br><br>
+
+    {% endfor %}
+
+    <button type="submit">Submit</button>
+</form>

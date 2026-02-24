@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Upload</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .form-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .form-header { text-align: center; margin-bottom: 30px; }
+        .form-header h1 { color: #0f766e; font-size: 28px; margin-bottom: 10px; }
+        .upload-area {
+            border: 3px dashed #0f766e;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .upload-area input[type="file"] { display: none; }
+        .upload-label {
+            cursor: pointer;
+            color: #0f766e;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .upload-label:hover { text-decoration: underline; }
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(15, 118, 110, 0.4);
+        }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-secondary:hover { background: #4b5563; }
+        .form-actions { display: flex; gap: 15px; margin-top: 30px; }
+        .alert { padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .alert-success { background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+        .alert-error { background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+        .info-card {
+            background: #f0fdfa;
+            border-left: 4px solid #0f766e;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .info-card h3 { color: #0f766e; margin-bottom: 15px; }
+        .info-card ul { margin-left: 20px; }
+        .info-card li { margin: 8px 0; color: #2c3e50; }
+        .csv-format {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .selected-file {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f0fdfa;
+            border-radius: 8px;
+            color: #0f766e;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-card">
+            <div class="form-header">
+                <h1>📤 Bulk Upload Academic Records</h1>
+                <p style="color: #7f8c8d;">Upload marks and attendance via CSV file</p>
+            </div>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+
+            <div class="info-card">
+                <h3>📋 CSV Format Requirements</h3>
+                <ul>
+                    <li>File must be in CSV format (.csv)</li>
+                    <li>First row must contain column headers</li>
+                    <li>Required columns: roll_no, subject, internal_type, marks, attendance_attended, attendance_total</li>
+                    <li>Marks should be out of 50</li>
+                    <li>Internal type should be "Internal 1" or "Internal 2"</li>
+                </ul>
+                
+                <div class="csv-format">
+roll_no,subject,internal_type,marks,attendance_attended,attendance_total<br>
+CS001,Data Structures,Internal 1,45,28,30<br>
+CS001,Operating Systems,Internal 1,38,25,30<br>
+CS002,Data Structures,Internal 1,22,20,30
+                </div>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                {% csrf_token %}
+                
+                <div class="upload-area">
+                    <label for="csv_file" class="upload-label">
+                        📁 Click to select CSV file
+                    </label>
+                    <input type="file" id="csv_file" name="csv_file" accept=".csv" required onchange="showFileName()">
+                    <div id="selectedFile" class="selected-file" style="display: none;"></div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Upload & Process</button>
+                    <a href="{% url 'admin_academic_records' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showFileName() {
+            const input = document.getElementById('csv_file');
+            const display = document.getElementById('selectedFile');
+            if (input.files.length > 0) {
+                display.textContent = '✓ Selected: ' + input.files[0].name;
+                display.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

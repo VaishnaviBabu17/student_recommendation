@@ -1,304 +1,471 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Academic Recommendation System</title>
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
-        body {
-            font-family: Arial;
+        * {
             margin: 0;
-            background-color: #f4f6f9;
+            padding: 0;
+            box-sizing: border-box;
         }
-
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 100%);
+            min-height: 100vh;
+        }
+        
         .header {
-            background: #2c3e50;
+            background: linear-gradient(135deg, #1e3a1a 0%, #2d5a27 100%);
             color: white;
-            padding: 15px;
+            padding: 25px;
             text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-
+        
+        .header h2 {
+            font-size: 2.2rem;
+            font-weight: 300;
+            margin: 0;
+        }
+        
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 30px auto;
+            padding: 0 20px;
         }
-
+        
         .card {
             background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 1px solid #e8f5e8;
+        }
+        
+        .card h3 {
+            color: #1e3a1a;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4a7c59;
+        }
+        
+        .badge {
+            padding: 8px 16px;
+            border-radius: 25px;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .excellent { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .good { background: linear-gradient(135deg, #3498db, #5dade2); }
+        .average { background: linear-gradient(135deg, #f39c12, #f7dc6f); }
+        .poor { background: linear-gradient(135deg, #e74c3c, #ec7063); }
+        
+        .form-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .input-field {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-field label {
+            color: #2d5a27;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+        
+        input {
+            padding: 12px 15px;
+            border: 2px solid #e8f5e8;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4a7c59;
+            box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #4a7c59 0%, #2d5a27 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 124, 89, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 124, 89, 0.4);
+        }
+        
+        .subject-entry {
+            background: #f8fffe;
+            border: 2px solid #e8f5e8;
             border-radius: 10px;
             padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
+            margin-bottom: 15px;
         }
-
-        .badge {
-            padding: 6px 15px;
-            border-radius: 20px;
-            color: white;
-            font-size: 14px;
+        
+        .subject-entry h4 {
+            color: #1e3a1a;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .performance-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-item {
+            background: #f8fffe;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e8f5e8;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
             font-weight: bold;
+            color: #2d5a27;
         }
-
-        .excellent { background-color: #28a745; }
-        .good { background-color: #007bff; }
-        .average { background-color: #ffc107; }
-        .poor { background-color: #dc3545; }
-
-        input {
-            padding: 7px;
-            margin: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        button {
-            padding: 8px 18px;
-            background-color: #2c3e50;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #1a252f;
-        }
-
-        h3 {
-            color: #2c3e50;
-        }
-
+        
         .section-title {
-            margin-top: 15px;
-            color: #34495e;
+            color: #2d5a27;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 20px 0 10px 0;
         }
-
+        
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        ul li {
+            background: #f8fffe;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4a7c59;
+        }
+        
         canvas {
-            margin-top: 15px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 15px;
+                padding: 0 10px;
+            }
+            
+            .header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .form-group {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
-
 <body>
-
-<div class="header">
-    <h2>📊 Student Academic Recommendation Dashboard</h2>
-</div>
-
-<div class="container">
-
-<!-- ================= STUDENT DETAILS ================= -->
-
-<div class="card">
-<form method="POST">
-    {% csrf_token %}
-    <input type="hidden" name="action" value="load_subjects">
-
-    <h3>Student Details</h3>
-
-    Register No:
-    <input type="text" name="reg_no" required>
-
-    Name:
-    <input type="text" name="name" required>
-
-    Department:
-    <input type="text" name="department" required>
-
-    Year:
-    <input type="number" name="year" required>
-
-    Semester:
-    <input type="number" name="semester" required>
-
-    <br><br>
-    <button type="submit">Load Subjects</button>
-</form>
-</div>
-
-<!-- ================= MARK ENTRY ================= -->
-
-{% if subjects %}
-
-<div class="card">
-<h3>Enter Marks and Attendance</h3>
-
-<form method="POST">
-    {% csrf_token %}
-    <input type="hidden" name="action" value="get_recommendation">
-
-    {% for subject in subjects %}
-
-        <h4>{{ subject }}</h4>
-
-        <input type="hidden" name="subjects" value="{{ subject }}">
-
-        Marks:
-        <input type="number" name="{{ subject }}_marks" required>
-
-        Attended:
-        <input type="number" name="{{ subject }}_attended" required>
-
-        Total:
-        <input type="number" name="{{ subject }}_total" required>
-
-        <br><br>
-
-    {% endfor %}
-
-    <button type="submit">Get Recommendation</button>
-</form>
-</div>
-
-{% endif %}
-
-<!-- ================= RESULTS ================= -->
-
-{% if recommendations %}
-
-<div class="card">
-<h3>Overall Performance</h3>
-
-Average Marks: <b>{{ overall_marks }}</b><br>
-Average Attendance: <b>{{ overall_attendance }}%</b><br><br>
-
-Performance:
-<span class="badge
-{% if overall_performance == 'Excellent' %} excellent
-{% elif overall_performance == 'Good' %} good
-{% elif overall_performance == 'Average' %} average
-{% else %} poor
-{% endif %}
-">
-{{ overall_performance }}
-</span>
-
-<br><br>
-
-<b>Strong Subjects:</b>
-<ul>
-{% for s in strong_subjects %}
-<li>{{ s }}</li>
-{% empty %}
-<li>None</li>
-{% endfor %}
-</ul>
-
-<b>Weak Subjects:</b>
-<ul>
-{% for w in weak_subjects %}
-<li>{{ w }}</li>
-{% empty %}
-<li>None</li>
-{% endfor %}
-</ul>
-
-</div>
-
-<!-- ================= PERFORMANCE ANALYTICS ================= -->
-
-<div class="card">
-<h3>📈 Performance Analytics</h3>
-
-<canvas id="marksChart"></canvas>
-<br>
-<canvas id="attendanceChart"></canvas>
-
-</div>
-
-<!-- ================= SUBJECT CARDS ================= -->
-
-<h3>Subject-wise Recommendations</h3>
-
-{% for data in recommendations %}
-
-<div class="card">
-
-<h3>{{ data.subject }}</h3>
-
-Marks: {{ data.marks }} <br>
-Attendance: {{ data.attendance }} % <br><br>
-
-Performance:
-<span class="badge
-{% if data.performance == 'Excellent' %} excellent
-{% elif data.performance == 'Good' %} good
-{% elif data.performance == 'Average' %} average
-{% else %} poor
-{% endif %}
-">
-{{ data.performance }}
-</span>
-
-<h4 class="section-title">📈 Improvement Plan</h4>
-<ul>
-{% for i in data.improvement_plan %}
-<li>{{ i }}</li>
-{% endfor %}
-</ul>
-
-<h4 class="section-title">📚 Books</h4>
-<ul>
-{% for b in data.books %}
-<li>{{ b }}</li>
-{% endfor %}
-</ul>
-
-<h4 class="section-title">🎓 Courses</h4>
-<ul>
-{% for c in data.courses %}
-<li>{{ c }}</li>
-{% endfor %}
-</ul>
-
-<h4 class="section-title">📝 Practice</h4>
-<ul>
-{% for p in data.practice %}
-<li>{{ p }}</li>
-{% endfor %}
-</ul>
-
-</div>
-
-{% endfor %}
-
-<!-- ================= CHART SCRIPT ================= -->
-
-<script>
-const subjects = {{ subject_names|safe }};
-const marks = {{ marks_data|safe }};
-const attendance = {{ attendance_data|safe }};
-
-new Chart(document.getElementById('marksChart'), {
-    type: 'bar',
-    data: {
-        labels: subjects,
-        datasets: [{
-            label: 'Marks',
-            data: marks,
-            backgroundColor: '#007bff'
-        }]
-    }
-});
-
-new Chart(document.getElementById('attendanceChart'), {
-    type: 'line',
-    data: {
-        labels: subjects,
-        datasets: [{
-            label: 'Attendance %',
-            data: attendance,
-            borderColor: '#28a745',
-            fill: false
-        }]
-    }
-});
-</script>
-
-{% endif %}
-
-</div>
+    <div class="header">
+        <h2>📊 Student Academic Recommendation Dashboard</h2>
+    </div>
+    
+    <div class="container">
+        <!-- Student Details -->
+        <div class="card">
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="load_subjects">
+                
+                <h3>Student Details</h3>
+                
+                <div class="form-group">
+                    <div class="input-field">
+                        <label>Register Number</label>
+                        <input type="text" name="reg_no" placeholder="Enter register number" required>
+                    </div>
+                    <div class="input-field">
+                        <label>Student Name</label>
+                        <input type="text" name="name" placeholder="Enter full name" required>
+                    </div>
+                    <div class="input-field">
+                        <label>Department</label>
+                        <input type="text" name="department" placeholder="Enter department" required>
+                    </div>
+                    <div class="input-field">
+                        <label>Academic Year</label>
+                        <input type="number" name="year" placeholder="Enter year" min="1" max="4" required>
+                    </div>
+                    <div class="input-field">
+                        <label>Semester</label>
+                        <input type="number" name="semester" placeholder="Enter semester" min="1" max="8" required>
+                    </div>
+                </div>
+                
+                <button type="submit">Load Subjects</button>
+            </form>
+        </div>
+        
+        <!-- Mark Entry -->
+        {% if subjects %}
+        <div class="card">
+            <h3>Enter Marks and Attendance</h3>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="get_recommendation">
+                
+                {% for subject in subjects %}
+                <div class="subject-entry">
+                    <h4>{{ subject }}</h4>
+                    <input type="hidden" name="subjects" value="{{ subject }}">
+                    
+                    <div class="form-group">
+                        <div class="input-field">
+                            <label>Marks Obtained</label>
+                            <input type="number" name="{{ subject }}_marks" placeholder="Enter marks" min="0" required>
+                        </div>
+                        <div class="input-field">
+                            <label>Classes Attended</label>
+                            <input type="number" name="{{ subject }}_attended" placeholder="Classes attended" min="0" required>
+                        </div>
+                        <div class="input-field">
+                            <label>Total Classes</label>
+                            <input type="number" name="{{ subject }}_total" placeholder="Total classes" min="1" required>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <button type="submit">Get Recommendation</button>
+            </form>
+        </div>
+        {% endif %}
+        
+        <!-- Results -->
+        {% if recommendations %}
+        <div class="card">
+            <h3>Overall Performance Summary</h3>
+            
+            <div class="performance-stats">
+                <div class="stat-item">
+                    <div class="stat-value">{{ overall_marks }}</div>
+                    <div>Average Marks</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ overall_attendance }}%</div>
+                    <div>Average Attendance</div>
+                </div>
+                <div class="stat-item">
+                    <span class="badge {% if overall_performance == 'Excellent' %}excellent{% elif overall_performance == 'Good' %}good{% elif overall_performance == 'Average' %}average{% else %}poor{% endif %}">
+                        {{ overall_performance }}
+                    </span>
+                    <div>Overall Performance</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div>
+                    <h4 class="section-title">💪 Strong Subjects</h4>
+                    <ul>
+                        {% for s in strong_subjects %}
+                        <li>{{ s }}</li>
+                        {% empty %}
+                        <li>None identified</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="section-title">⚠️ Areas for Improvement</h4>
+                    <ul>
+                        {% for w in weak_subjects %}
+                        <li>{{ w }}</li>
+                        {% empty %}
+                        <li>None identified</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Performance Analytics -->
+        <div class="card">
+            <h3>📈 Performance Analytics</h3>
+            <canvas id="marksChart"></canvas>
+            <canvas id="attendanceChart"></canvas>
+        </div>
+        
+        <!-- Subject-wise Recommendations -->
+        <h3 style="color: white; text-align: center; margin: 30px 0;">Subject-wise Recommendations</h3>
+        
+        {% for data in recommendations %}
+        <div class="card">
+            <h3>{{ data.subject }}</h3>
+            
+            <div class="performance-stats">
+                <div class="stat-item">
+                    <div class="stat-value">{{ data.marks }}</div>
+                    <div>Marks</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ data.attendance }}%</div>
+                    <div>Attendance</div>
+                </div>
+                <div class="stat-item">
+                    <span class="badge {% if data.performance == 'Excellent' %}excellent{% elif data.performance == 'Good' %}good{% elif data.performance == 'Average' %}average{% else %}poor{% endif %}">
+                        {{ data.performance }}
+                    </span>
+                    <div>Performance</div>
+                </div>
+            </div>
+            
+            <h4 class="section-title">📈 Improvement Plan</h4>
+            <ul>
+                {% for i in data.improvement_plan %}
+                <li>{{ i }}</li>
+                {% endfor %}
+            </ul>
+            
+            <h4 class="section-title">📚 Recommended Books</h4>
+            <ul>
+                {% for b in data.books %}
+                <li>{{ b }}</li>
+                {% endfor %}
+            </ul>
+            
+            <h4 class="section-title">🎓 Online Courses</h4>
+            <ul>
+                {% for c in data.courses %}
+                <li>{{ c }}</li>
+                {% endfor %}
+            </ul>
+            
+            <h4 class="section-title">📝 Practice Resources</h4>
+            <ul>
+                {% for p in data.practice %}
+                <li>{{ p }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+        
+        <!-- Chart Script -->
+        <script>
+            const subjects = {{ subject_names|safe }};
+            const marks = {{ marks_data|safe }};
+            const attendance = {{ attendance_data|safe }};
+            
+            new Chart(document.getElementById('marksChart'), {
+                type: 'bar',
+                data: {
+                    labels: subjects,
+                    datasets: [{
+                        label: 'Marks',
+                        data: marks,
+                        backgroundColor: 'rgba(74, 124, 89, 0.8)',
+                        borderColor: '#4a7c59',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#2d5a27'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: '#2d5a27'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#2d5a27'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            new Chart(document.getElementById('attendanceChart'), {
+                type: 'line',
+                data: {
+                    labels: subjects,
+                    datasets: [{
+                        label: 'Attendance %',
+                        data: attendance,
+                        borderColor: '#4a7c59',
+                        backgroundColor: 'rgba(74, 124, 89, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#2d5a27'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: '#2d5a27'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#2d5a27'
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+        {% endif %}
+    </div>
 </body>
 </html>

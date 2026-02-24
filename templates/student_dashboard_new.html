@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { color: #0f766e; font-size: 26px; }
+        .header-actions { display: flex; gap: 12px; }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(15, 118, 110, 0.4); }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-secondary:hover { background: #4b5563; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid;
+        }
+        .stat-card.total { border-color: #0f766e; }
+        .stat-card.weak { border-color: #dc2626; }
+        .stat-card.average { border-color: #f59e0b; }
+        .stat-card.strong { border-color: #059669; }
+        .stat-card .label { color: #7f8c8d; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .stat-card .number { font-size: 32px; font-weight: 700; }
+        .stat-card.total .number { color: #0f766e; }
+        .stat-card.weak .number { color: #dc2626; }
+        .stat-card.average .number { color: #f59e0b; }
+        .stat-card.strong .number { color: #059669; }
+        
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .chart-card h3 { color: #2c3e50; margin-bottom: 20px; font-size: 18px; }
+        
+        .recommendations-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+        .recommendations-section h2 { color: #0f766e; margin-bottom: 20px; font-size: 20px; }
+        .recommendation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .recommendation-card {
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        .recommendation-card.weak { background: #fee2e2; border-color: #dc2626; }
+        .recommendation-card.strong { background: #d1fae5; border-color: #059669; }
+        .recommendation-card h4 { margin-bottom: 8px; font-size: 16px; }
+        .recommendation-card .marks { font-size: 14px; color: #4b5563; margin-bottom: 5px; }
+        .recommendation-card .internal { font-size: 12px; color: #6b7280; }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            color: #7f8c8d;
+        }
+        .no-data h2 { margin-bottom: 10px; }
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>📚 My Academic Dashboard</h1>
+                {% if student.name %}
+                <p style="color: #6b7280; margin-top: 5px;">Welcome, {{ student.name }}!</p>
+                {% endif %}
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'student_info' %}" class="btn btn-primary">📝 Enter Marks</a>
+                <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+            </div>
+        </div>
+
+        {% if total_records > 0 %}
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="label">Total Subjects</div>
+                <div class="number">{{ total_records }}</div>
+            </div>
+            <div class="stat-card total">
+                <div class="label">Average Marks</div>
+                <div class="number">{{ avg_marks }}<span style="font-size: 18px;">/50</span></div>
+            </div>
+            <div class="stat-card total">
+                <div class="label">Average Attendance</div>
+                <div class="number">{{ avg_attendance }}<span style="font-size: 18px;">%</span></div>
+            </div>
+            <div class="stat-card weak">
+                <div class="label">Weak Subjects</div>
+                <div class="number">{{ weak_count }}</div>
+            </div>
+            <div class="stat-card average">
+                <div class="label">Average Subjects</div>
+                <div class="number">{{ average_count }}</div>
+            </div>
+            <div class="stat-card strong">
+                <div class="label">Strong Subjects</div>
+                <div class="number">{{ strong_count }}</div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h3>📊 Performance Distribution</h3>
+                <canvas id="performanceChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>📈 Internal Exam Comparison</h3>
+                <canvas id="internalChart"></canvas>
+            </div>
+        </div>
+
+        {% if subject_labels %}
+        <div class="chart-card" style="margin-bottom: 25px;">
+            <h3>📉 Subject-wise Performance (Recent)</h3>
+            <canvas id="subjectChart"></canvas>
+        </div>
+        {% endif %}
+
+        <!-- Recent Recommendations -->
+        {% if recent_weak or recent_strong %}
+        <div class="recommendations-section">
+            <h2>🎯 Recent Performance Highlights</h2>
+            <div class="recommendation-grid">
+                {% for subject, marks, internal in recent_weak %}
+                <div class="recommendation-card weak">
+                    <h4>⚠️ {{ subject }}</h4>
+                    <div class="marks">Marks: {{ marks }}/50 - Needs Improvement</div>
+                    <div class="internal">{{ internal }}</div>
+                </div>
+                {% endfor %}
+                
+                {% for subject, marks, internal in recent_strong %}
+                <div class="recommendation-card strong">
+                    <h4>⭐ {{ subject }}</h4>
+                    <div class="marks">Marks: {{ marks }}/50 - Excellent!</div>
+                    <div class="internal">{{ internal }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="action-buttons">
+                <a href="{% url 'student_info' %}" class="btn btn-primary">View Full Recommendations</a>
+            </div>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- No Data State -->
+        <div class="no-data">
+            <h2>📋 No Academic Records Yet</h2>
+            <p>Start by entering your marks to see your performance dashboard</p>
+            <div class="action-buttons">
+                <a href="{% url 'student_info' %}" class="btn btn-primary">Enter Your Marks</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        {% if total_records > 0 %}
+        // Performance Distribution Doughnut Chart
+        const perfCtx = document.getElementById('performanceChart').getContext('2d');
+        new Chart(perfCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Weak (<25)', 'Average (25-40)', 'Strong (>40)'],
+                datasets: [{
+                    data: [{{ weak_count }}, {{ average_count }}, {{ strong_count }}],
+                    backgroundColor: ['#dc2626', '#f59e0b', '#059669'],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // Internal Exam Comparison Bar Chart
+        const internalCtx = document.getElementById('internalChart').getContext('2d');
+        new Chart(internalCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Internal 1', 'Internal 2'],
+                datasets: [{
+                    label: 'Average Marks',
+                    data: [{{ internal1_avg }}, {{ internal2_avg }}],
+                    backgroundColor: ['#0f766e', '#14b8a6'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 50,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '/50';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        {% if subject_labels %}
+        // Subject-wise Performance Line Chart
+        const subjectCtx = document.getElementById('subjectChart').getContext('2d');
+        new Chart(subjectCtx, {
+            type: 'line',
+            data: {
+                labels: {{ subject_labels|safe }},
+                datasets: [{
+                    label: 'Marks',
+                    data: {{ subject_marks|safe }},
+                    borderColor: '#0f766e',
+                    backgroundColor: 'rgba(15, 118, 110, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#0f766e',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 50,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '/50';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+        {% endif %}
+        {% endif %}
+    </script>
+</body>
+</html>

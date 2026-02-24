@@ -1,0 +1,261 @@
+{% extends 'base_student.html' %}
+
+{% block content %}
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid;
+    }
+    .stat-card.total { border-color: #0f766e; }
+    .stat-card.weak { border-color: #dc2626; }
+    .stat-card.strong { border-color: #059669; }
+    .stat-card .label { color: #7f8c8d; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+    .stat-card .number { font-size: 32px; font-weight: 700; }
+    .stat-card.total .number { color: #0f766e; }
+    .stat-card.weak .number { color: #dc2626; }
+    .stat-card.strong .number { color: #059669; }
+    
+    .chart-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+    .chart-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .chart-card h3 { color: #2c3e50; margin-bottom: 20px; font-size: 18px; }
+    
+    .recommendations-section {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+    }
+    .recommendations-section h2 { color: #0f766e; margin-bottom: 20px; font-size: 20px; }
+    .recommendation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    .recommendation-card {
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid;
+        min-height: 200px;
+    }
+    .recommendation-card.weak { background: #fee2e2; border-color: #dc2626; }
+    .recommendation-card.strong { background: #d1fae5; border-color: #059669; }
+    .recommendation-card h4 { margin-bottom: 8px; font-size: 16px; color: #1f2937; }
+    .recommendation-card .marks { font-size: 13px; color: #4b5563; margin-bottom: 5px; font-weight: 600; }
+    .recommendation-card .internal { font-size: 11px; color: #6b7280; }
+    
+    .welcome-card {
+        background: white;
+        padding: 60px 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    .welcome-card h2 { color: #0f766e; font-size: 28px; margin-bottom: 15px; }
+    .welcome-card p { color: #6b7280; font-size: 16px; margin-bottom: 30px; }
+    .action-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+        font-size: 14px;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+        color: white;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(15, 118, 110, 0.4); }
+</style>
+
+{% if has_data %}
+<!-- Statistics Cards -->
+<div class="stats-grid">
+    <div class="stat-card total">
+        <div class="label">Total Subjects</div>
+        <div class="number">{{ total_records }}</div>
+    </div>
+    <div class="stat-card total">
+        <div class="label">Average Marks</div>
+        <div class="number">{{ avg_marks }}<span style="font-size: 18px;">/50</span></div>
+    </div>
+    <div class="stat-card total">
+        <div class="label">Average Attendance</div>
+        <div class="number">{{ avg_attendance }}<span style="font-size: 18px;">%</span></div>
+    </div>
+    <div class="stat-card weak">
+        <div class="label">Weak Subjects</div>
+        <div class="number">{{ weak_count }}</div>
+    </div>
+    <div class="stat-card strong">
+        <div class="label">Strong Subjects</div>
+        <div class="number">{{ strong_count }}</div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="chart-grid">
+    <div class="chart-card">
+        <h3>📊 Performance Distribution</h3>
+        <canvas id="performanceChart"></canvas>
+    </div>
+    <div class="chart-card">
+        <h3>📈 Internal Exam Comparison</h3>
+        <canvas id="internalChart"></canvas>
+    </div>
+</div>
+
+{% if subject_labels %}
+<div class="chart-card" style="margin-bottom: 25px;">
+    <h3>📉 Subject-wise Performance (Recent)</h3>
+    <canvas id="subjectChart"></canvas>
+</div>
+{% endif %}
+
+<!-- Recommendations -->
+{% if weak_recommendations or strong_recommendations %}
+<div class="recommendations-section">
+    <h2>📋 Recommendation History</h2>
+    
+    {% if weak_recommendations %}
+    <h3 style="color: #dc2626; margin: 20px 0 15px 0; font-size: 18px;">⚠️ Subjects Needing Improvement</h3>
+    <div class="recommendation-grid">
+        {% for rec in weak_recommendations %}
+        <div class="recommendation-card weak">
+            <h4>{{ rec.subject }}</h4>
+            <div class="marks">Marks: {{ rec.marks }}/50 | Attendance: {{ rec.attendance|floatformat:1 }}%</div>
+            <div class="internal">{{ rec.internal_type }} - {{ rec.date|date:"M d, Y" }}</div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #fca5a5;">
+                <div style="font-size: 12px; font-weight: 600; color: #991b1b; margin-bottom: 5px;">📚 Books:</div>
+                <ul style="font-size: 11px; color: #4b5563; margin-left: 20px;">
+                    {% for book in rec.books %}<li>{{ book }}</li>{% endfor %}
+                </ul>
+                <div style="font-size: 12px; font-weight: 600; color: #991b1b; margin: 8px 0 5px 0;">🌐 Online:</div>
+                <ul style="font-size: 11px; color: #4b5563; margin-left: 20px;">
+                    {% for online in rec.online %}<li>{{ online }}</li>{% endfor %}
+                </ul>
+                <div style="font-size: 12px; font-weight: 600; color: #991b1b; margin: 8px 0 5px 0;">💻 Practice:</div>
+                <ul style="font-size: 11px; color: #4b5563; margin-left: 20px;">
+                    {% for practice in rec.practice %}<li>{{ practice }}</li>{% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if strong_recommendations %}
+    <h3 style="color: #059669; margin: 30px 0 15px 0; font-size: 18px;">⭐ Strong Performance</h3>
+    <div class="recommendation-grid">
+        {% for rec in strong_recommendations %}
+        <div class="recommendation-card strong">
+            <h4>{{ rec.subject }}</h4>
+            <div class="marks">Marks: {{ rec.marks }}/50 | Attendance: {{ rec.attendance|floatformat:1 }}%</div>
+            <div class="internal">{{ rec.internal_type }} - {{ rec.date|date:"M d, Y" }}</div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #6ee7b7; font-size: 12px; color: #065f46;">
+                <strong>💡 Keep it up!</strong> Explore advanced topics and mentor peers.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const perfCtx = document.getElementById('performanceChart').getContext('2d');
+new Chart(perfCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Weak (<25)', 'Strong (>40)'],
+        datasets: [{
+            data: [{{ weak_count }}, {{ strong_count }}],
+            backgroundColor: ['#dc2626', '#059669'],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+const internalCtx = document.getElementById('internalChart').getContext('2d');
+new Chart(internalCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Internal 1', 'Internal 2'],
+        datasets: [{
+            label: 'Average Marks',
+            data: [{{ internal1_avg }}, {{ internal2_avg }}],
+            backgroundColor: ['#0f766e', '#14b8a6'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true, max: 50, ticks: { callback: v => v + '/50' } } },
+        plugins: { legend: { display: false } }
+    }
+});
+
+{% if subject_labels %}
+const subjectCtx = document.getElementById('subjectChart').getContext('2d');
+new Chart(subjectCtx, {
+    type: 'line',
+    data: {
+        labels: {{ subject_labels|safe }},
+        datasets: [{
+            label: 'Marks',
+            data: {{ subject_marks|safe }},
+            borderColor: '#0f766e',
+            backgroundColor: 'rgba(15, 118, 110, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#0f766e',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 5
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true, max: 50, ticks: { callback: v => v + '/50' } } },
+        plugins: { legend: { display: false } }
+    }
+});
+{% endif %}
+</script>
+
+{% else %}
+<!-- Welcome Message for New Students -->
+<div class="welcome-card">
+    <h2>👋 Welcome{% if student.name %}, {{ student.name }}{% endif %}!</h2>
+    <p>Get started by entering your academic information and marks to see your personalized dashboard with performance analytics and recommendations.</p>
+    <div class="action-buttons">
+        <a href="{% url 'student_info' %}" class="btn btn-primary">📋 Enter Student Information</a>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

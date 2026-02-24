@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Student</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-header h1 {
+            color: #0f766e;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #0f766e;
+        }
+
+        .form-group input:disabled {
+            background: #f3f4f6;
+            cursor: not-allowed;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(15, 118, 110, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-card">
+            <div class="form-header">
+                <h1>✏️ {% if not student.name or not student.department %}Complete Student Profile{% else %}Edit Student{% endif %}</h1>
+                <p style="color: #7f8c8d;">{% if not student.name or not student.department %}Fill in missing student details{% else %}Update student details{% endif %}</p>
+            </div>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" value="{{ student.user.username }}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" value="{{ student.user.email }}">
+                </div>
+
+                <div class="form-group">
+                    <label>Full Name {% if not student.name %}<span style="color: #dc2626;">*</span>{% endif %}</label>
+                    <input type="text" name="name" value="{{ student.name|default:'' }}" placeholder="Enter full name" {% if not student.name %}required{% endif %}>
+                </div>
+
+                <div class="form-group">
+                    <label>Roll Number {% if not student.roll_no %}<span style="color: #dc2626;">*</span>{% endif %}</label>
+                    <input type="text" name="roll_no" value="{{ student.roll_no|default:'' }}" placeholder="Enter roll number" {% if not student.roll_no %}required{% endif %}>
+                </div>
+
+                <div class="form-group">
+                    <label>Department {% if not student.department %}<span style="color: #dc2626;">*</span>{% endif %}</label>
+                    <select name="department" {% if not student.department %}required{% endif %}>
+                        <option value="">Select Department</option>
+                        <option value="BME" {% if student.department == "BME" %}selected{% endif %}>BME - Biomedical Engineering</option>
+                        <option value="CIVIL" {% if student.department == "CIVIL" %}selected{% endif %}>CIVIL - Civil Engineering</option>
+                        <option value="CSD" {% if student.department == "CSD" %}selected{% endif %}>CSD - Computer Science & Design</option>
+                        <option value="CSE" {% if student.department == "CSE" %}selected{% endif %}>CSE - Computer Science Engineering</option>
+                        <option value="EEE" {% if student.department == "EEE" %}selected{% endif %}>EEE - Electrical & Electronics</option>
+                        <option value="ECE" {% if student.department == "ECE" %}selected{% endif %}>ECE - Electronics & Communication</option>
+                        <option value="EIE" {% if student.department == "EIE" %}selected{% endif %}>EIE - Electronics & Instrumentation</option>
+                        <option value="ISE" {% if student.department == "ISE" %}selected{% endif %}>ISE - Information Science</option>
+                        <option value="MECH" {% if student.department == "MECH" %}selected{% endif %}>MECH - Mechanical Engineering</option>
+                        <option value="MECT" {% if student.department == "MECT" %}selected{% endif %}>MECT - Mechatronics</option>
+                        <option value="AGE" {% if student.department == "AGE" %}selected{% endif %}>AGE - Agricultural Engineering</option>
+                        <option value="AIDS" {% if student.department == "AIDS" %}selected{% endif %}>AIDS - AI & Data Science</option>
+                        <option value="AIML" {% if student.department == "AIML" %}selected{% endif %}>AIML - AI & Machine Learning</option>
+                        <option value="BT" {% if student.department == "BT" %}selected{% endif %}>BT - Biotechnology</option>
+                        <option value="CSBS" {% if student.department == "CSBS" %}selected{% endif %}>CSBS - CS & Business Systems</option>
+                        <option value="CT" {% if student.department == "CT" %}selected{% endif %}>CT - Computer Technology</option>
+                        <option value="FT" {% if student.department == "FT" %}selected{% endif %}>FT - Food Technology</option>
+                        <option value="FASH" {% if student.department == "FASH" %}selected{% endif %}>FASH - Fashion Technology</option>
+                        <option value="IT" {% if student.department == "IT" %}selected{% endif %}>IT - Information Technology</option>
+                        <option value="TT" {% if student.department == "TT" %}selected{% endif %}>TT - Textile Technology</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Year</label>
+                    <select name="year">
+                        <option value="">Select Year</option>
+                        <option value="1" {% if student.year == 1 %}selected{% endif %}>1st Year</option>
+                        <option value="2" {% if student.year == 2 %}selected{% endif %}>2nd Year</option>
+                        <option value="3" {% if student.year == 3 %}selected{% endif %}>3rd Year</option>
+                        <option value="4" {% if student.year == 4 %}selected{% endif %}>4th Year</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Semester</label>
+                    <select name="semester">
+                        <option value="">Select Semester</option>
+                        <option value="1" {% if student.semester == 1 %}selected{% endif %}>Semester 1</option>
+                        <option value="2" {% if student.semester == 2 %}selected{% endif %}>Semester 2</option>
+                        <option value="3" {% if student.semester == 3 %}selected{% endif %}>Semester 3</option>
+                        <option value="4" {% if student.semester == 4 %}selected{% endif %}>Semester 4</option>
+                        <option value="5" {% if student.semester == 5 %}selected{% endif %}>Semester 5</option>
+                        <option value="6" {% if student.semester == 6 %}selected{% endif %}>Semester 6</option>
+                        <option value="7" {% if student.semester == 7 %}selected{% endif %}>Semester 7</option>
+                        <option value="8" {% if student.semester == 8 %}selected{% endif %}>Semester 8</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Update Student</button>
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

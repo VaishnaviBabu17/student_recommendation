@@ -1,0 +1,7 @@
+# Run these commands to apply the database changes:
+
+python manage.py makemigrations
+python manage.py migrate
+
+# Then restart your Django server:
+python manage.py runserver
