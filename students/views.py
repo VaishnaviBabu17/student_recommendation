@@ -2047,4 +2047,4 @@ def signup(request):
         password = request.POST['password']
         User.objects.create_superuser(username=username, password=password, email='')
         return redirect('login')
-    return render(request, 'students/signup.html')
+    return render(request, 'signup.html')
