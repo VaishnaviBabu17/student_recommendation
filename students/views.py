@@ -2039,3 +2039,12 @@ def export_students_pdf(request):
 
     doc.build(elements)
     return response
+
+
+def signup(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        User.objects.create_superuser(username=username, password=password, email='')
+        return redirect('login')
+    return render(request, 'students/signup.html')

@@ -20,4 +20,5 @@ urlpatterns = [
     path('export_students_pdf/', views.export_students_pdf, name='export_students_pdf'),
     path('logout/', views.logout_view, name='logout'),
     path('create_admin/', views.create_admin, name='create_admin'),
+    path('signup/', views.signup, name='signup'),
 ]
