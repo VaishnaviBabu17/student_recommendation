@@ -15,12 +15,12 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         border-left: 4px solid;
     }
-    .stat-card.total { border-color: #0f766e; }
+    .stat-card.total { border-color: #0891b2; }
     .stat-card.weak { border-color: #dc2626; }
     .stat-card.strong { border-color: #059669; }
-    .stat-card .label { color: #7f8c8d; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+    .stat-card .label { color: #64748b; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
     .stat-card .number { font-size: 32px; font-weight: 700; }
-    .stat-card.total .number { color: #0f766e; }
+    .stat-card.total .number { color: #0891b2; }
     .stat-card.weak .number { color: #dc2626; }
     .stat-card.strong .number { color: #059669; }
     
@@ -45,7 +45,7 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         margin-bottom: 25px;
     }
-    .recommendations-section h2 { color: #0f766e; margin-bottom: 20px; font-size: 20px; }
+    .recommendations-section h2 { color: #0891b2; margin-bottom: 20px; font-size: 20px; }
     .recommendation-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -70,7 +70,7 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         text-align: center;
     }
-    .welcome-card h2 { color: #0f766e; font-size: 28px; margin-bottom: 15px; }
+    .welcome-card h2 { color: #0891b2; font-size: 28px; margin-bottom: 15px; }
     .welcome-card p { color: #6b7280; font-size: 16px; margin-bottom: 30px; }
     .action-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
     .btn {
@@ -83,10 +83,10 @@
         font-size: 14px;
     }
     .btn-primary {
-        background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+        background: linear-gradient(135deg, #0891b2 0%, #0369a1 100%);
         color: white;
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(15, 118, 110, 0.4); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(8, 145, 178, 0.4); }
 </style>
 
 {% if has_data %}
@@ -208,7 +208,7 @@ new Chart(internalCtx, {
         datasets: [{
             label: 'Average Marks',
             data: [{{ internal1_avg }}, {{ internal2_avg }}],
-            backgroundColor: ['#0f766e', '#14b8a6'],
+            backgroundColor: ['#0891b2', '#059669'],
             borderWidth: 0
         }]
     },
@@ -228,11 +228,11 @@ new Chart(subjectCtx, {
         datasets: [{
             label: 'Marks',
             data: {{ subject_marks|safe }},
-            borderColor: '#0f766e',
-            backgroundColor: 'rgba(15, 118, 110, 0.1)',
+            borderColor: '#0891b2',
+            backgroundColor: 'rgba(8, 145, 178, 0.1)',
             tension: 0.4,
             fill: true,
-            pointBackgroundColor: '#0f766e',
+            pointBackgroundColor: '#0891b2',
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
             pointRadius: 5
