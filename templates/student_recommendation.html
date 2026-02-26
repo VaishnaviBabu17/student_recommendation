@@ -60,10 +60,11 @@
 
     .section-title {
         font-size: 24px;
-        color: #0891b2;
+        color: #0369a1;
         margin: 40px 0 20px 0;
         padding-bottom: 10px;
         border-bottom: 3px solid #0891b2;
+        font-weight: 700;
     }
 
     .subject-card {
@@ -229,6 +230,13 @@
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(8, 145, 178, 0.4);
     }
+
+    .section-description {
+        color: #1e293b;
+        margin-bottom: 20px;
+        font-size: 15px;
+        font-weight: 500;
+    }
 </style>
 
 <div class="recommendation-container">
@@ -340,7 +348,7 @@
 
         {% if average_subjects %}
         <h2 class="section-title">📊 Average Performance Subjects</h2>
-        <p style="color: #7f8c8d; margin-bottom: 20px;">These subjects are performing adequately. Keep up the good work!</p>
+        <p class="section-description">These subjects are performing adequately. Keep up the good work!</p>
         {% for sub in average_subjects %}
             <div class="subject-card {{ sub.status }}">
                 <div class="subject-header">
