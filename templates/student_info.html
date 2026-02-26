@@ -16,7 +16,7 @@
     }
 
     .info-header {
-        background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+        background: linear-gradient(135deg, #0891b2 0%, #0369a1 100%);
         color: white;
         padding: 40px 30px;
         text-align: center;
@@ -79,15 +79,15 @@
     .form-group input:focus,
     .form-group select:focus {
         outline: none;
-        border-color: #0f766e;
+        border-color: #0891b2;
         background: white;
-        box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+        box-shadow: 0 0 0 4px rgba(8, 145, 178, 0.1);
     }
 
     .form-group select {
         cursor: pointer;
         appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230f766e' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230891b2' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 16px center;
         padding-right: 40px;
@@ -104,7 +104,7 @@
         top: 50%;
         transform: translateY(-50%);
         font-size: 18px;
-        color: #0f766e;
+        color: #0891b2;
     }
 
     .input-icon input {
@@ -112,8 +112,8 @@
     }
 
     .info-note {
-        background: #d1fae5;
-        border-left: 4px solid #0f766e;
+        background: #e0f2fe;
+        border-left: 4px solid #0891b2;
         padding: 15px 20px;
         border-radius: 8px;
         margin-bottom: 25px;
@@ -122,13 +122,13 @@
     }
 
     .info-note strong {
-        color: #0f766e;
+        color: #0891b2;
     }
 
     .btn-submit {
         width: 100%;
         padding: 16px;
-        background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+        background: linear-gradient(135deg, #0891b2 0%, #0369a1 100%);
         color: white;
         border: none;
         border-radius: 10px;
@@ -141,7 +141,7 @@
 
     .btn-submit:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(15, 118, 110, 0.4);
+        box-shadow: 0 10px 25px rgba(8, 145, 178, 0.4);
     }
 
     .btn-submit:active {
@@ -171,11 +171,11 @@
                 {% csrf_token %}
 
                 <div class="form-group">
-                    <label for="reg_no">Registration Number <span class="required">*</span></label>
+                    <label for="roll_no">Registration Number <span class="required">*</span></label>
                     <div class="input-icon" data-icon="🎓">
                         <input type="text" 
-                               id="reg_no"
-                               name="reg_no" 
+                               id="roll_no"
+                               name="roll_no" 
                                placeholder="Enter your registration number" 
                                required>
                     </div>
