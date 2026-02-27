@@ -181,14 +181,12 @@
                 {% for message in messages %}
                     <div class="alert">
                         {{ message }}
+                        {% if 'Invalid' in message or 'password' in message|lower %}
+                            <br><br>
+                            Forgot your password? <a href="{% url 'reset_password' %}" style="color: #0369a1; font-weight: 600; text-decoration: underline;">Reset it here</a>
+                        {% endif %}
                     </div>
                 {% endfor %}
-            {% endif %}
-
-            {% if show_forgot_password %}
-                <div class="alert" style="background: #fff3cd; border-left: 4px solid #ffc107; color: #856404;">
-                    Forgot your password? <a href="{% url 'reset_password' %}" style="color: #0369a1; font-weight: 600; text-decoration: underline;">Reset it here</a>
-                </div>
             {% endif %}
 
             <form method="POST">

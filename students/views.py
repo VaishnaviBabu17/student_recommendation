@@ -1088,10 +1088,9 @@ def login_view(request):
 
         else:
             messages.error(request, "Invalid username or password")
-            return redirect('/students/?error=true')
+            return render(request, "login.html")
 
-    show_forgot_password = request.GET.get('error') == 'true'
-    return render(request, "login.html", {'show_forgot_password': show_forgot_password})
+    return render(request, "login.html")
 
 
 def logout_view(request):
