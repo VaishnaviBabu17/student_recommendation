@@ -1088,8 +1088,10 @@ def login_view(request):
 
         else:
             messages.error(request, "Invalid username or password")
+            return redirect('/students/?error=true')
 
-    return render(request, "login.html")
+    show_forgot_password = request.GET.get('error') == 'true'
+    return render(request, "login.html", {'show_forgot_password': show_forgot_password})
 
 
 def logout_view(request):
@@ -2048,3 +2050,26 @@ def signup(request):
         User.objects.create_superuser(username=username, password=password, email='')
         return redirect('login')
     return render(request, 'signup.html')
+
+
+def reset_password(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        if new_password != confirm_password:
+            messages.error(request, "Passwords do not match")
+            return render(request, 'reset_password.html')
+        
+        try:
+            user = User.objects.get(username=username)
+            user.set_password(new_password)
+            user.save()
+            messages.success(request, "Password reset successful. Please login with your new password.")
+            return redirect('login')
+        except User.DoesNotExist:
+            messages.error(request, "Username not found")
+            return render(request, 'reset_password.html')
+    
+    return render(request, 'reset_password.html')
