@@ -1,1 +1,1 @@
-web: cd backend && gunicorn student_recommendation.wsgi --bind 0.0.0.0:$PORT
+web: gunicorn --chdir backend student_recommendation.wsgi:application --bind 0.0.0.0:$PORT

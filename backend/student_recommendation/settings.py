@@ -72,12 +72,21 @@ WSGI_APPLICATION = 'student_recommendation.wsgi.application'
 
 
 # Database configuration
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': PROJECT_ROOT / 'db.sqlite3',
+try:
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=f'sqlite:///{PROJECT_ROOT / "db.sqlite3"}',
+            conn_max_age=600
+        )
     }
-}
+except ImportError:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': PROJECT_ROOT / 'db.sqlite3',
+        }
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [
