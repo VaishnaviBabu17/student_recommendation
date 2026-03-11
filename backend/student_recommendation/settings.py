@@ -1,12 +1,13 @@
 from pathlib import Path
 import os
-import dj_database_url
 
+# Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = BASE_DIR.parent  # This points to the main project directory
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-later')
 
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'  # Changed default to True for development
 
 ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')]
 
@@ -54,7 +55,7 @@ ROOT_URLCONF = 'student_recommendation.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # corrected path
+        'DIRS': [PROJECT_ROOT / 'frontend' / 'templates'],  # Updated path to frontend/templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -70,11 +71,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'student_recommendation.wsgi.application'
 
 
+# Database configuration
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
-        conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': PROJECT_ROOT / 'db.sqlite3',
+    }
 }
 
 
@@ -97,10 +99,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    PROJECT_ROOT / 'frontend' / 'static',  # Updated path to frontend/static
 ]
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = PROJECT_ROOT / 'staticfiles'  # Updated to use PROJECT_ROOT
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

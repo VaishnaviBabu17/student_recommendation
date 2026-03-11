@@ -82,6 +82,19 @@
             padding-right: 45px;
         }
 
+        /* Hide browser password reveal button */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+            display: none;
+        }
+
+        input[type="password"]::-webkit-credentials-auto-fill-button,
+        input[type="password"]::-webkit-contacts-auto-fill-button {
+            visibility: hidden;
+            pointer-events: none;
+            position: absolute;
+        }
+
         .toggle-password {
             position: absolute;
             right: 15px;

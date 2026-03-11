@@ -8,6 +8,12 @@ https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
 """
 
 import os
+import sys
+from pathlib import Path
+
+# Add backend directory to Python path
+backend_path = Path(__file__).resolve().parent.parent.parent / 'backend'
+sys.path.insert(0, str(backend_path))
 
 from django.core.wsgi import get_wsgi_application
 
