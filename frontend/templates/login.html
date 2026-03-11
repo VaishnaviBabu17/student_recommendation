@@ -201,7 +201,7 @@
                     <div class="alert">
                         {{ message }}
                     </div>
-                    {% if 'Invalid username or password' in message|string %}
+                    {% if message.tags == 'error' %}
                     <div class="alert" style="background: #fff3cd; border-left: 4px solid #ffc107; color: #856404; margin-top: 10px;">
                         Forgot your password? <a href="{% url 'reset_password' %}" style="color: #0369a1; font-weight: 600; text-decoration: underline;">Reset it here</a>
                     </div>
