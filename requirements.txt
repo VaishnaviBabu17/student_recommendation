@@ -7,4 +7,4 @@ sqlparse==0.5.5
 asgiref==3.11.1
 tzdata==2025.3
 pillow==12.2.0
-psycopg[binary]==3.1.18
+psycopg[binary]==3.2.13
