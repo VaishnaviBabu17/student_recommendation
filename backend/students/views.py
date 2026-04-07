@@ -15,6 +15,9 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from datetime import datetime
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
 
 # ================= SUBJECTS =================
 
@@ -2038,6 +2041,182 @@ def export_students_pdf(request):
             elements.append(PageBreak())
 
     doc.build(elements)
+    return response
+
+
+# ================= EXCEL EXPORT =================
+
+@login_required
+def export_students_excel(request):
+    if not request.user.is_superuser:
+        return redirect('student_dashboard')
+
+    department = request.GET.get('department', '')
+    year = request.GET.get('year', '')
+    semester = request.GET.get('semester', '')
+
+    students = Student.objects.select_related('user').filter(department__isnull=False)
+    if department:
+        students = students.filter(department=department)
+    if year:
+        students = students.filter(year=int(year))
+    if semester:
+        students = students.filter(semester=int(semester))
+
+    wb = openpyxl.Workbook()
+
+    # ── Sheet 1: Student Summary ──────────────────────────────────────────────
+    ws1 = wb.active
+    ws1.title = 'Student Summary'
+
+    header_fill = PatternFill('solid', fgColor='0F766E')
+    weak_fill   = PatternFill('solid', fgColor='FEE2E2')
+    avg_fill    = PatternFill('solid', fgColor='FEF9C3')
+    strong_fill = PatternFill('solid', fgColor='DCFCE7')
+    header_font = Font(bold=True, color='FFFFFF', size=11)
+    bold_font   = Font(bold=True, size=10)
+    thin_border = Border(
+        left=Side(style='thin'), right=Side(style='thin'),
+        top=Side(style='thin'), bottom=Side(style='thin')
+    )
+
+    headers = ['#', 'Name', 'Roll No', 'Department', 'Year', 'Semester',
+               'Email', 'Avg Marks (/50)', 'Avg Attendance (%)',
+               'Weak Subjects', 'Strong Subjects', 'Performance']
+    ws1.append(headers)
+    for col, _ in enumerate(headers, 1):
+        cell = ws1.cell(row=1, column=col)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+        cell.border = thin_border
+    ws1.row_dimensions[1].height = 20
+
+    for idx, student in enumerate(students, 1):
+        records = AcademicRecord.objects.filter(student=student)
+        if records.exists():
+            avg_marks = round(sum(r.marks for r in records) / records.count(), 1)
+            avg_att   = round(sum(r.attendance_percentage for r in records) / records.count(), 1)
+            weak_subs = ', '.join(r.subject for r in records if r.marks < 25) or 'None'
+            strong_subs = ', '.join(r.subject for r in records if r.marks > 40) or 'None'
+            if avg_marks < 25:
+                perf, fill = 'Needs Improvement', weak_fill
+            elif avg_marks > 40:
+                perf, fill = 'Excellent', strong_fill
+            else:
+                perf, fill = 'Average', avg_fill
+        else:
+            avg_marks = avg_att = 0
+            weak_subs = strong_subs = 'No Records'
+            perf, fill = 'No Data', PatternFill('solid', fgColor='F3F4F6')
+
+        row = [idx, student.name or 'N/A', student.roll_no or 'N/A',
+               student.department or 'N/A',
+               student.year or 'N/A', student.semester or 'N/A',
+               student.user.email or 'N/A',
+               avg_marks, avg_att, weak_subs, strong_subs, perf]
+        ws1.append(row)
+        for col in range(1, len(row) + 1):
+            cell = ws1.cell(row=idx + 1, column=col)
+            cell.border = thin_border
+            cell.alignment = Alignment(vertical='center', wrap_text=True)
+            if col == 12:
+                cell.fill = fill
+                cell.font = bold_font
+
+    col_widths = [4, 20, 14, 14, 6, 8, 28, 14, 16, 40, 40, 18]
+    for i, w in enumerate(col_widths, 1):
+        ws1.column_dimensions[get_column_letter(i)].width = w
+
+    # ── Sheet 2: Detailed Academic Records ───────────────────────────────────
+    ws2 = wb.create_sheet('Academic Records')
+    rec_headers = ['#', 'Student Name', 'Roll No', 'Department', 'Semester',
+                   'Subject', 'Internal Type', 'Marks (/50)', 'Attended',
+                   'Total Classes', 'Attendance (%)', 'Status']
+    ws2.append(rec_headers)
+    for col, _ in enumerate(rec_headers, 1):
+        cell = ws2.cell(row=1, column=col)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+        cell.border = thin_border
+    ws2.row_dimensions[1].height = 20
+
+    row_num = 2
+    for student in students:
+        for record in AcademicRecord.objects.filter(student=student).order_by('subject'):
+            status = 'Strong' if record.marks > 40 else ('Weak' if record.marks < 25 else 'Average')
+            fill = strong_fill if status == 'Strong' else (weak_fill if status == 'Weak' else avg_fill)
+            row_data = [
+                row_num - 1,
+                student.name or 'N/A',
+                student.roll_no or 'N/A',
+                student.department or 'N/A',
+                student.semester or 'N/A',
+                record.subject,
+                record.internal_type,
+                record.marks,
+                record.attendance_attended,
+                record.attendance_total,
+                record.attendance_percentage,
+                status
+            ]
+            ws2.append(row_data)
+            for col in range(1, len(row_data) + 1):
+                cell = ws2.cell(row=row_num, column=col)
+                cell.border = thin_border
+                cell.alignment = Alignment(vertical='center')
+                if col == 12:
+                    cell.fill = fill
+                    cell.font = bold_font
+            row_num += 1
+
+    rec_widths = [4, 20, 14, 14, 8, 35, 14, 12, 10, 14, 14, 12]
+    for i, w in enumerate(rec_widths, 1):
+        ws2.column_dimensions[get_column_letter(i)].width = w
+
+    # ── Sheet 3: Department Analytics ────────────────────────────────────────
+    ws3 = wb.create_sheet('Department Analytics')
+    dept_headers = ['Department', 'Total Students', 'Avg Marks', 'Weak Students', 'Strong Students']
+    ws3.append(dept_headers)
+    for col, _ in enumerate(dept_headers, 1):
+        cell = ws3.cell(row=1, column=col)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+        cell.border = thin_border
+
+    dept_data = {}
+    for student in students:
+        dept = student.department or 'Unknown'
+        records = AcademicRecord.objects.filter(student=student)
+        if dept not in dept_data:
+            dept_data[dept] = {'count': 0, 'total_marks': 0, 'weak': 0, 'strong': 0}
+        dept_data[dept]['count'] += 1
+        if records.exists():
+            avg = sum(r.marks for r in records) / records.count()
+            dept_data[dept]['total_marks'] += avg
+            if avg < 25:
+                dept_data[dept]['weak'] += 1
+            elif avg > 40:
+                dept_data[dept]['strong'] += 1
+
+    for r_idx, (dept, data) in enumerate(dept_data.items(), 2):
+        avg = round(data['total_marks'] / data['count'], 1) if data['count'] else 0
+        ws3.append([dept, data['count'], avg, data['weak'], data['strong']])
+        for col in range(1, 6):
+            ws3.cell(row=r_idx, column=col).border = thin_border
+            ws3.cell(row=r_idx, column=col).alignment = Alignment(horizontal='center')
+
+    for i, w in enumerate([20, 16, 12, 16, 16], 1):
+        ws3.column_dimensions[get_column_letter(i)].width = w
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    filename = f"Student_Records_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    wb.save(response)
     return response
 
 

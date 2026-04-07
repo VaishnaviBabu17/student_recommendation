@@ -18,6 +18,7 @@ urlpatterns = [
     path('admin_view_recommendations/<int:student_id>/', views.admin_view_recommendations, name='admin_view_recommendations'),
     path('admin_analytics/', views.admin_analytics, name='admin_analytics'),
     path('export_students_pdf/', views.export_students_pdf, name='export_students_pdf'),
+    path('export_students_excel/', views.export_students_excel, name='export_students_excel'),
     path('logout/', views.logout_view, name='logout'),
     path('create_admin/', views.create_admin, name='create_admin'),
     path('signup/', views.signup, name='signup'),

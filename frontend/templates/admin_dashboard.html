@@ -83,6 +83,16 @@
             background: #4b5563;
         }
 
+        .btn-success {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(22, 163, 74, 0.4);
+        }
+
         .btn-small {
             padding: 8px 16px;
             font-size: 14px;
@@ -267,7 +277,8 @@
                 <a href="{% url 'admin_add_student' %}" class="btn btn-primary">➕ Add Student</a>
                 <a href="{% url 'admin_academic_records' %}" class="btn btn-primary">📊 Academic Records</a>
                 <a href="{% url 'admin_analytics' %}" class="btn btn-primary">📈 Analytics</a>
-                <a href="{% url 'export_students_pdf' %}?{{ request.GET.urlencode }}" class="btn btn-primary">📥 Download PDF</a>
+                <a href="{% url 'export_students_pdf' %}?{{ request.GET.urlencode }}" class="btn btn-primary">📄 Download PDF</a>
+                <a href="{% url 'export_students_excel' %}?{{ request.GET.urlencode }}" class="btn btn-success">📊 Download Excel</a>
                 <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
             </div>
         </div>
@@ -340,12 +351,17 @@
             <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;">
             
             <div style="margin-top: 20px;">
-                <h3 style="font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 15px;">📥 Export to PDF</h3>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <a href="{% url 'export_students_pdf' %}?{{ request.GET.urlencode }}&sort=name" class="btn btn-primary btn-small">🔤 Alphabetical (A-Z)</a>
-                    <a href="{% url 'export_students_pdf' %}?{{ request.GET.urlencode }}&sort=name_desc" class="btn btn-primary btn-small">🔥 Alphabetical (Z-A)</a>
+                <h3 style="font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 15px;">📄 Export to PDF</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+                    <a href="{% url 'export_students_pdf' %}?{{ request.GET.urlencode }}&sort=name" class="btn btn-primary btn-small">🔤 A-Z</a>
+                    <a href="{% url 'export_students_pdf' %}?{{ request.GET.urlencode }}&sort=name_desc" class="btn btn-primary btn-small">🔡 Z-A</a>
                     <a href="{% url 'export_students_pdf' %}?{{ request.GET.urlencode }}&sort=performance" class="btn btn-primary btn-small">🏆 By Performance</a>
                 </div>
+                <h3 style="font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 15px;">📊 Export to Excel</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="{% url 'export_students_excel' %}?{{ request.GET.urlencode }}" class="btn btn-success btn-small">⬇️ Download Excel (All Sheets)</a>
+                </div>
+                <p style="margin-top: 8px; font-size: 12px; color: #6b7280;">Includes: Student Summary · Academic Records · Department Analytics</p>
             </div>
         </div>
 
